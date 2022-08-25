@@ -82,3 +82,85 @@ DOM 자체는 빠릅니다.
 1. DOM의 상태를 메모리에 저장하고 변경 전과 변경 후의 상태를 비교한 뒤
    최소한의 내용만 반영하는 기능 -> 성능 향상
 2. 가상 돔은 돔의 상태를 메모리 위에 계속 올려두고 DOM에 변경이 있을 때만 해당 변경을 반영합니다.
+---
+# useState
+- State Hook은 함수형 컴포넌트가 클래스형 컴포넌트처럼 **지역 상태**를 가질 수 있도록 한다.
+
+### 버튼 클릭시마다 화면에 표시되는 숫자가 1씩 증가하는 카운터를 렌더링하는 예시
+```jsx
+import {useState, useCallback} from 'react';
+
+const Example = () => {
+  const [count, setCount] = useState(0);
+
+  const handleCount = useCallback(() => {
+    setCount(count + 1);
+  },[count])
+
+  return(
+    <>
+      <p>{count}만큼 클릭되었습니다.</p>
+      <button onClick={handleCount}>클릭</button>
+    </>
+  )
+}
+```
+useState() 함수를 이용하면 함수형 컴포넌트에서 **지역 상태**를 저장할 수 있다.
+리액트는 이 상태 값을 렌더링 간에 유지한다.
+useState()함수가 반환하는 배열의 
+첫 번째 요소는 해당 상태의 값,
+두 번째 요소는 해당 상태를 설정하기 위한 함수이다.
+useState() 함수의 인자로 전달하는 값은 해당 상태의 초깃값으로, **첫 번째 렌더링 시에만 사용된다**
+
+여러 개의 state 변수를 선언하려면 다음과 같이 useState() 함수를 여러 번 호출하면 된다.
+```jsx
+const Example = () => {
+  const [age, setAge] = useState(42);
+  const [fruit, setFruit] = useState('banana');
+  const [todos, setTodos] = useState([{text : 'Learn React'}]);
+}
+```
+
+구조 분해 할당 문법은 useState()함수에 의해 반환된 각각의 상태 값에 서로 다른 변수명을 할당할 수 있도록 해준다.
+**useState()함수를 여러 번 호출하는 경우 그 호출 순서는 반드시 매 렌더링마다 같게 해야 한다.**
+### 참고
+- [티스토리](https://it-eldorado.tistory.com/98)
+### useState는 비동기인가?
+- useState는 비동기적으로 동작한다.
+- 하나의 이벤트 핸들러 함수 내에서 같은 setState가 호출된다면 마지막에 실행한 setState가 실행되어 렌더링 된다.
+```jsx
+import {useState} from 'react';
+
+const Example = () => {
+  const [count, setCount] = useState(0);
+
+  const onClick = () => {
+    setCount(count + 1); // setState 실행1 <- 실행 안함
+    console.log(count);
+    
+    setCount(count+1.5); // setState 실행2 <- 실행
+    console.log(count);
+  }
+
+  return(
+    <>
+    <p>{count}</p>
+    <button onClick={onClick}>+</button>
+    </>
+  )
+}
+```
+
+위의 코드를 실행하면 결괏값이 비동기적으로 동작하기 때문에
+1.5씩만 증가한다.
+
+동일한 state를 연속적으로 업데이트하는 경우,
+모든 요청에 따라 setState를 각각 동기로 수행 후 바로 리렌더링하는 것이 아니라
+**변경 사항을 모아서 한  번에 일괄처리를 하기 때문이다.**
+전달된 setState를 하나로 병합한 후
+최종적으로 한 번의 setState를 하게 되어 **결국 마지막 명령만 수행**하게 된다.
+
+이렇게 일괄적인 batch update를 통해서 컴포넌트의 렌더링 횟수를 최소화하여
+불필요한 렌더링을 방지하고 더 빠른 속도로 동작하게끔 한다.
+### 참고
+- [티스토리](https://goddino.tistory.com/326)
