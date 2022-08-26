@@ -89,3 +89,40 @@ var bindedWhoAmI = myWhoAmI.bind(someone);   // bind는 someone을 this로 고�
 // this를 예외적으로 호출과 무관하게 묶어주는 애가 bind라는 함수임
 // 
 ```
+
+
+
+<br><br>
+
+# this :one:
+
+```js
+/* this */
+// 함수 호출 맥락(context)를 뜻함
+// 맥락 - 같은 상황에 따라서 달라진다는 뜻.
+// 즉, 함수를 어떻게 호출하느냐에 따라서 this가 가리키는 대상이 달라진다는 뜻
+// 함수와 객체의 느슨한 관계가 느슨한 자바스크립트에서 this는 이 둘을 연결시켜주는 실질적인 연결점 역할을 함
+
+// this -> 함수 내에서 사용할 수 있는 일종의 변수이며, 약속된 변수. 변수 내에 담겨있는 값은 그 함수를 어떻게 호출하느냐에 따라 달라짐
+
+/* this 예시1 */
+function func1(){
+    if (window === this){
+        // window - client javascript. 웹 브라우저 자바스크립트에서 전역객체의 이름
+        // function 내에서 this 변수와 같은지를 체크
+        console.log("window === this");
+    }
+}
+
+func1(); 
+```
+
+
+
+<br>
+
+# this :two:
+
+```js
+
+```
