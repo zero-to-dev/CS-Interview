@@ -94,7 +94,7 @@ var bindedWhoAmI = myWhoAmI.bind(someone);   // bind는 someone을 this로 고�
 
 <br><br>
 
-# this :one:
+# this 
 
 ```js
 /* this */
@@ -118,11 +118,3 @@ func1();
 ```
 
 
-
-<br>
-
-# this :two:
-
-```js
-
-```
