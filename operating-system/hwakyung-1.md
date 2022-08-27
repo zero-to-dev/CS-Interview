@@ -164,22 +164,21 @@
 - 자원 사용 마치면 락 반납
 
 ```c
-// P and V
-wait(S) {
-    while (S <= 0);
-    S--;
-}
-signal(S) {
-    S++;
+mutex = 1;
+
+void lock () {
+	while (mutex != 1)
+  {
+    // mutex 값이 1이 될 때까지 대기
+  }
+    // 이 구역에 도착했다는 것은 화장실 키를 획득 했다는 것이고 mutex 값이 1이라는 뜻. 이제 뮤텍스 값을 0으로 만들어 다른 프로세스(혹은 쓰레드)의 접근을 제한.
+   mutex = 0;
 }
 
-// Mutex implementation in binary semaphore
-do {
-    wait(&mutex);
-    /* Critical Section */
-    signal(&mutex);
-    /* Remainder Section */
-} while (true);
+void unlock() {
+	// 임계 구역(화장실)에서 나온 프로세스는 다른 프로세스가 접근할 개수 있도록 뮤텍스 값을 1으로 만들어 락을 해제.
+	mutex = 1;
+}
 ```
 
 _출처: https://rebas.kr/857 [PROJECT REBAS:티스토리]_
@@ -196,26 +195,54 @@ _출처: https://rebas.kr/857 [PROJECT REBAS:티스토리]_
 -
 
 ```C
-// P and V
-wait(S) {
-    while (S <= 0);
-    S--;
-}
-signal(S) {
-    S++;
+struct semaphore {
+	int count;
+    	queueType queue;
+};
+
+void semWait (semaphore s) {
+	s.count--;
+    if (s.count < 0)
+    {
+    	// 이 구역으로 들어왔다는 것은 현재 프로세스(스레드)가 공유 자원에 접근할 수 없다는 것을 의미.
+    	// 요청한 프로세스를 s.queue에 연결
+      // 요청한 프로세스를 블록 상태로 락
+    }
 }
 
-// Mutex implementation in binary semaphore
-do {
-    wait(&mutex);
-    /* Critical Section */
-    signal(&mutex);
-    /* Remainder Section */
-} while (true);
-
+void semSignal (semaphore s) {
+	s.count++;
+    if (s.count <= 0)
+    {
+    	// 대기하고 있는 프로세스(스레드)를 위해 s.queue에 연결되어 있는 프로세스를 큐에서 제거
+      // 프로세스의 상태를 실행 가능으로 변경하고 ready list에 연결
+    }
+}
 ```
 
-_출처: https://rebas.kr/857 [PROJECT REBAS:티스토리]_
+```C
+const int n = // 프로세스 개수
+semaphore s = 1;
+
+void Process (int i) {
+	while (true)
+  {
+     semWait(s); //세마포어 값을 감소시킨다.
+
+     /* 임계 영역(Critical Section) */
+
+     semSignal(s); //세마포어 값을 증가시킨다.
+
+     /* 임계 영역 이후 코드 */
+   }
+}
+
+void main() {
+	parbegin (Process(1), Process(2), ..., Process(n));
+}
+```
+
+_출처:[세마포어와 뮤텍스의 차이](https://velog.io/@hidaehyunlee/Philosophers-%EC%98%88%EC%8B%9C%EC%98%88%EC%A0%9C%EB%A1%9C-%EB%B3%B4%EB%8A%94-%EB%AE%A4%ED%85%8D%EC%8A%A4%EC%99%80-%EC%84%B8%EB%A7%88%ED%8F%AC%EC%96%B4%EC%9D%98-%EC%B0%A8%EC%9D%B4)_
 
 ### ✅ 뮤텍스와 세마포어의 공통점
 
